@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="description" content="Racing Challenge PRO - لعبة سباق سيارات">
+    <title>Racing Challenge PRO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top-bar">
+    <div class="brand-wrap">
+        <div class="brand-mark">R</div>
+        <div class="brand-copy">
+            <div class="logo">RACING <span>CHALLENGE PRO</span></div>
+            <small>DRIVE · COMPETE · WIN</small>
+        </div>
+    </div>
+    <div class="header-metrics">
+        <div class="metric wallet">
+            <span class="metric-label">رصيد العملات</span>
+            <strong><span id="coins">0</span> <small>CR</small></strong>
+        </div>
+        <div class="metric best">
+            <span class="metric-label">أفضل نتيجة</span>
+            <strong id="bestScore">0</strong>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+    <section id="homePage" class="page active-page">
+        <section class="welcome-banner">
+            <div class="welcome-copy">
+                <span class="welcome-kicker">RACING CHALLENGE PRO · SEASON 01</span>
+                <h1>السرعة لها أبطالها.</h1>
+                <p>اختر سيارتك، طوّر أداءها، واصعد عبر 1000 مرحلة نحو القمة.</p>
+                <div class="welcome-stats">
+                    <div><strong id="heroLevel">1</strong><span>المرحلة الحالية</span></div>
+                    <div><strong>1000</strong><span>مرحلة سباق</span></div>
+                    <div><strong>3</strong><span>قلوب لكل محاولة</span></div>
+                </div>
+            </div>
+            <div class="welcome-visual">
+                <img src="https://images.pexels.com/photos/29772448/pexels-photo-29772448.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="سيارة رياضية حقيقية على مضمار سباق" loading="eager" referrerpolicy="no-referrer">
+                <div class="welcome-visual-shade"></div>
+                <span class="welcome-visual-label">TRACK READY</span>
+            </div>
+        </section>
+        <div class="panel">
+            <h2>🏁 اختر المضمار</h2>
+            <div class="track-buttons">
+                <button class="track-btn active" data-track="day">☀️ النهار</button>
+                <button class="track-btn" data-track="city">🌃 المدينة</button>
+                <button class="track-btn" data-track="desert">🏜️ الصحراء</button>
+                <button class="track-btn" data-track="snow">❄️ الثلج</button>
+            </div>
+
+            <div class="weather-info">
+                <span>🌦️ أجواء السباق</span>
+                <strong id="weatherName">طقس مشمس ☀️</strong>
+            </div>
+        </div>
+
+        <div class="panel multiplayer-panel">
+            <h2>🌐 اللعب الجماعي أونلاين</h2>
+            <p class="local-note">أنشئ غرفة ثنائية أو رباعية، أو ادخل بكود صديقك.</p>
+            <div class="mp-actions">
+                <button id="createDuoRoom" type="button">👥 إنشاء غرفة ثنائية</button>
+                <button id="createQuadRoom" type="button">🏎️ إنشاء غرفة رباعية</button>
+            </div>
+            <div class="mp-join-row">
+                <input id="joinRoomCode" type="text" maxlength="6" placeholder="كود الغرفة" autocomplete="off">
+                <button id="joinRoomBtn" type="button">دخول الغرفة</button>
+            </div>
+            <div id="multiplayerStatus" class="mp-status">لست داخل غرفة أونلاين.</div>
+            <div id="multiplayerPlayers" class="mp-players"></div>
+            <div class="mp-actions">
+                <button id="startMultiplayerBtn" type="button" disabled>🚦 ابدأ السباق الجماعي</button>
+                <button id="leaveMultiplayerBtn" type="button" class="danger-btn" disabled>🚪 مغادرة الغرفة</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🎮 السباق</h2>
+            <div class="game-area">
+                <div class="game-hud">
+                    <span>⭐ النقاط: <span id="score">0</span></span>
+                    <span>⏱️ الوقت: <span id="raceTime">180</span> ثانية</span>
+                    <span>🪙 العملات: <span id="raceCoins">0</span></span>
+                </div>
+
+                <div class="canvas-wrap">
+                    <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+                    <div id="countdown" class="countdown hidden"></div>
+
+                    <div id="pauseOverlay" class="pause-overlay hidden">
+                        <h2>⏸️ اللعبة متوقفة</h2>
+                        <button id="resumeBtn">▶️ استكمال</button>
+                    </div>
+
+                    <div id="resultScreen" class="result-screen hidden">
+                        <h2 id="resultTitle">انتهى السباق</h2>
+                        <div id="medalResult">🏁</div>
+                        <p id="resultDetails"></p>
+                        <button id="restartBtn">🔄 إعادة السباق</button>
+                        <button id="resultMenuBtn">🏠 القائمة الرئيسية</button>
+                    </div>
+                </div>
+
+                <div class="nitro-panel">
+                    <span>⚡ النيترو</span>
+                    <div class="nitro-bar">
+                        <div id="nitroFill"></div>
+                    </div>
+                    <span id="nitroText">100%</span>
+                </div>
+
+                <div class="controls">
+                    <button id="rightBtn" class="control-btn">➡️</button>
+                    <button id="startBtn" class="start-btn">🏁 ابدأ السباق</button>
+                    <button id="leftBtn" class="control-btn">⬅️</button>
+                </div>
+
+                <div class="extra-controls">
+                    <button id="nitroBtn">⚡ نيترو</button>
+                    <button id="shieldBtn">🛡️ درع</button>
+                    <button id="magnetBtn">🧲 مغناطيس</button>
+                    <button id="pauseBtn">⏸️ إيقاف</button>
+                </div>
+
+                <p class="keyboard-help">
+                    الكمبيوتر: الأسهم للتحرك و Escape للإيقاف.
+                </p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🏆 ترتيب المتسابقين</h2>
+            <p class="local-note">ترتيب محلي داخل اللعبة</p>
+            <div id="raceRanking"></div>
+        </div>
+    </section>
+
+    <section id="shopPage" class="page hidden">
+        <div class="garage-intro">
+            <div>
+                <span class="section-kicker">THE PERFORMANCE GARAGE</span>
+                <h1>جراج الأساطير</h1>
+                <p>استعرض السيارات، اختر المفضلة، وامتلك القوة التي تناسب أسلوبك.</p>
+            </div>
+            <div class="garage-wallet">
+                <span>رصيدك الحالي</span>
+                <strong><span id="shopCoins">0</span> <small>CR</small></strong>
+            </div>
+        </div>
+        <div class="shop-photo-note">الصور فوتوغرافية لسيارات حقيقية لأغراض العرض؛ أسماء السيارات ومواصفاتها داخل اللعبة افتراضية. <a href="https://www.pexels.com/license/" target="_blank" rel="noopener noreferrer">ترخيص صور Pexels</a>.</div>
+        <div class="panel garage-panel">
+            <div class="panel-heading-row">
+                <div><span class="section-kicker">SELECT YOUR MACHINE</span><h2>مجموعة السيارات <span class="count-pill">27</span></h2></div>
+                <span class="panel-side-note">افتح سيارات جديدة بالعملات</span>
+            </div>
+            <div id="carShop" class="garage-grid"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading-row"><div><span class="section-kicker">UPGRADE BAY</span><h2>مركز تطوير الأداء</h2></div><span class="panel-side-note">كل سيارة لها مستوياتها الخاصة</span></div>
+            <div class="upgrade-grid">
+                <button id="speedUpgrade">🚀 تطوير السرعة</button>
+                <button id="nitroUpgrade">⚡ تطوير النيترو</button>
+                <button id="shieldUpgrade">🛡️ تطوير الدرع</button>
+            </div>
+            <p id="upgradeInfo" class="upgrade-info">كل سيارة لها تطويراتها الخاصة.</p>
+        </div>
+    </section>
+
+    <section id="resultsPage" class="page hidden">
+        <div class="panel">
+            <h2>🏆 أفضل النتائج المحلية</h2>
+            <div id="leaderboardList"></div>
+            <button id="clearRecordsBtn" class="danger-btn">🗑️ مسح النتائج المحلية</button>
+        </div>
+
+        <div class="panel">
+            <h2>🌍 أفضل 10 متسابقين أونلاين</h2>
+            <p class="local-note">النتائج المحفوظة على الإنترنت من جميع اللاعبين</p>
+            <div id="onlineLeaderboard">
+                جاري تحميل النتائج...
+            </div>
+            <button id="refreshOnlineLeaderboard" type="button">
+                🔄 تحديث النتائج
+            </button>
+        </div>
+    </section>
+
+    <section id="challengesPage" class="page hidden">
+        <div class="panel">
+            <h2>🎯 تحديات ومراحل اللعبة - 1000 مرحلة</h2>
+            <p id="levelProgress" class="level-progress"></p>
+            <div id="levelsList" class="levels-list"></div>
+        </div>
+
+        <div class="panel">
+            <h2>📅 التحدي اليومي</h2>
+
+            <div class="daily-challenge">
+                <div class="daily-icon">🏆</div>
+                <h3 id="dailyTitle">اجمع 5 عملات</h3>
+                <p id="dailyDescription">
+                    اجمع 5 عملات أثناء السباق واحصل على 150 عملة مكافأة.
+                </p>
+
+                <div class="daily-progress">
+                    <div id="dailyProgressFill"></div>
+                </div>
+
+                <p id="dailyProgressText">0 / 5</p>
+
+                <button id="dailyClaimBtn" disabled>
+                    🎁 استلام المكافأة
+                </button>
+
+                <p id="dailyStatus">
+                    اجمع العملات لإكمال التحدي.
+                </p>
+        </div>
+    </section>
+
+    <section id="settingsPage" class="page hidden">
+        <div class="panel">
+            <h2>⚙️ إعدادات اللعبة</h2>
+            <label for="difficultySelect">مستوى الصعوبة</label>
+            <select id="difficultySelect">
+                <option value="easy">سهل</option>
+                <option value="normal" selected>متوسط</option>
+                <option value="hard">صعب</option>
+            </select>
+        </div>
+
+        <div class="panel">
+            <h2>🎮 طريقة التحكم</h2>
+            <div class="control-settings">
+                <label for="controlMode">اختر طريقة التحكم</label>
+                <select id="controlMode">
+                    <option value="buttons">الأزرار</option>
+                    <option value="tilt">إمالة الهاتف</option>
+                </select>
+                <p id="controlHint">استخدم أزرار اليمين واليسار للتحرك.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🔊 الصوت</h2>
+            <button id="soundToggle" class="settings-button">
+                🔊 الصوت: تشغيل
+            </button>
+        </div>
+
+        <div class="panel">
+            <h2>ℹ️ عن اللعبة</h2>
+            <p>Racing Challenge PRO</p>
+            <p>الإصدار 3.0</p>
+        </div>
+    </section>
+
+</main>
+
+<nav class="bottom-nav">
+    <button class="nav-btn active" data-page="homePage">
+        <span>🏠</span><small>الرئيسية</small>
+    </button>
+    <button class="nav-btn" data-page="shopPage">
+        <span>🛒</span><small>المتجر</small>
+    </button>
+    <button class="nav-btn" data-page="resultsPage">
+        <span>🏆</span><small>النتائج</small>
+    </button>
+    <button class="nav-btn" data-page="challengesPage">
+        <span>🎯</span><small>التحديات</small>
+    </button>
+    <button class="nav-btn" data-page="settingsPage">
+        <span>⚙️</span><small>الإعدادات</small>
+    </button>
+</nav>
+
+<div id="mainMenu" class="main-menu">
+    <div class="menu-content">
+        <div class="menu-car">🏎️</div>
+        <h1>RACING</h1>
+        <h2>CHALLENGE PRO</h2>
+        <p>استعد لأقوى تحديات السباق!</p>
+
+        <label for="playerNameInput">🏁 اسم اللاعب الذي سيظهر في الترتيب</label>
+        <input id="playerNameInput" type="text" maxlength="18" autocomplete="nickname" placeholder="اكتب اسمك هنا" />
+
+        <label for="menuTrack">اختر المضمار</label>
+        <select id="menuTrack">
+            <option value="day">النهار</option>
+            <option value="city">المدينة</option>
+            <option value="desert">الصحراء</option>
+            <option value="snow">الثلج</option>
+        </select>
+
+        <button id="menuPlayBtn">🏁 ابدأ اللعب</button>
+        <p class="menu-version">Racing Challenge PRO - V3.0</p>
+    </div>
+</div><script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import {
+        getAuth,
+        signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-analytics.js";
+    import { getDatabase, ref, get, set, update, onValue, runTransaction, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        query,
+        orderBy,
+        limit
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC1DrOeWu_OCWd2CvqC-S-BwziKkqp1ZQY",
+        databaseURL: "https://racing-game-62933-default-rtdb.europe-west1.firebasedatabase.app",
+        authDomain: "racing-game-62933.firebaseapp.com",
+        projectId: "racing-game-62933",
+        storageBucket: "racing-game-62933.firebasestorage.app",
+        messagingSenderId: "226024777371",
+        appId: "1:226024777371:web:b92d6cdd3689703ab1483e",
+        measurementId: "G-LY7KS62BGY"
+    };
+
+    function withTimeout(promise, ms = 15000, message = "انتهت مهلة الاتصال بـ Firebase. تحقق من الإنترنت وإعدادات قاعدة البيانات.") {
+        let timer;
+        return Promise.race([
+            Promise.resolve(promise),
+            new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error(message)), ms);
+            })
+        ]).finally(() => clearTimeout(timer));
+    }
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const authReady = withTimeout(
+        signInAnonymously(auth),
+        15000,
+        "تسجيل الدخول المجهول إلى Firebase لم يكتمل خلال 15 ثانية. تحقق من تفعيل Anonymous في Authentication."
+    );
+
+    try {
+        getAnalytics(app);
+    } catch (e) {
+        // التحليلات قد لا تعمل محلياً بدون HTTPS أو دعم المتصفح
+    }
+
+    const db = getFirestore(app);
+    const resultsCollection = collection(db, "raceResults");
+
+    window.firebaseDB = {
+        async saveRaceResult({ playerName = "متسابق", score = 0, coins = 0, track = "day" }) {
+            await authReady;
+            return await addDoc(resultsCollection, {
+                playerName,
+                uid: auth.currentUser.uid,
+                score: Number(score),
+                coins: Number(coins),
+                track,
+                createdAt: Date.now()
+            });
+        },
+
+        async getTopScores(maxResults = 10) {
+            await authReady;
+            const q = query(resultsCollection, orderBy("score", "desc"), limit(maxResults));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        }
+    };
+
+    const realtimeDB = getDatabase(app);
+    const roomCodeChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    window.racingOnlineDB = {
+        async getUid() {
+            await authReady;
+            return auth.currentUser.uid;
+        },
+
+        async createRoom(maxPlayers, playerName) {
+            await authReady;
+            const uid = auth.currentUser.uid;
+
+            for (let attempt = 0; attempt < 8; attempt++) {
+                let code = "";
+
+                for (let i = 0; i < 6; i++) {
+                    code += roomCodeChars[Math.floor(Math.random() * roomCodeChars.length)];
+                }
+
+                const roomRef = ref(realtimeDB, `multiplayerRooms/${code}`);
+
+                const result = await withTimeout(
+                    runTransaction(roomRef, current => {
+                        if (current !== null) return;
+
+                        return {
+                            code,
+                            maxPlayers,
+                            hostUid: uid,
+                            status: "waiting",
+                            createdAt: Date.now(),
+                            startedAt: null,
+                            players: {
+                                [uid]: {
+                                    uid,
+                                    name: playerName,
+                                    x: 200,
+                                    progress: 0,
+                                    score: 0,
+                                    color: "#2196f3",
+                                    joinedAt: Date.now(),
+                                    finished: false,
+                                    connected: true
+                                }
+                            }
+                        };
+                    }),
+                    15000,
+                    "قاعدة البيانات لم تستجب لإنشاء الغرفة خلال 15 ثانية. افحص قواعد Realtime Database والاتصال."
+                );
+
+                if (result.committed) {
+                    try {
+                        await withTimeout(
+                            onDisconnect(ref(realtimeDB, `multiplayerRooms/${code}/players/${uid}`)).remove(),
+                            7000,
+                            "تعذر تسجيل إجراء مغادرة الغرفة تلقائيًا."
+                        );
+                    } catch (disconnectError) {
+                        console.warn("onDisconnect registration failed:", disconnectError);
+                    }
+
+                    return { code, uid };
+                }
+            }
+
+            throw new Error("تعذر إنشاء كود غرفة فريد. حاول مرة أخرى.");
+        },
+
+        async joinRoom(code, playerName) {
+            await authReady;
+
+            const uid = auth.currentUser.uid;
+            const roomRef = ref(realtimeDB, `multiplayerRooms/${code}`);
+            let joinError = "";
+
+            const result = await withTimeout(
+                runTransaction(roomRef, room => {
+                    if (!room) {
+                        joinError = "الغرفة غير موجودة. تأكد من الكود.";
+                        return;
+                    }
+
+                    if (room.status !== "waiting") {
+                        joinError = "السباق بدأ بالفعل أو انتهى.";
+                        return;
+                    }
+
+                    room.players = room.players || {};
+
+                    if (room.players[uid]) return room;
+
+                    if (Object.keys(room.players).length >= Number(room.maxPlayers || 2)) {
+                        joinError = "الغرفة مكتملة.";
+                        return;
+                    }
+
+                    room.players[uid] = {
+                        uid,
+                        name: playerName,
+                        x: 200,
+                        progress: 0,
+                        score: 0,
+                        color: ["#e53935", "#43a047", "#ff9800"][Object.keys(room.players).length % 3],
+                        joinedAt: Date.now(),
+                        finished: false,
+                        connected: true
+                    };
+
+                    return room;
+                }),
+                15000,
+                "قاعدة البيانات لم تستجب للانضمام خلال 15 ثانية. افحص قواعد Realtime Database والاتصال."
+            );
+
+            if (!result.committed) {
+                throw new Error(joinError || "تعذر الانضمام للغرفة.");
+            }
+
+            try {
+                await withTimeout(
+                    onDisconnect(ref(realtimeDB, `multiplayerRooms/${code}/players/${uid}`)).remove(),
+                    7000,
+                    "تعذر تسجيل إجراء مغادرة الغرفة تلقائيًا."
+                );
+            } catch (disconnectError) {
+                console.warn("onDisconnect registration failed:", disconnectError);
+            }
+
+            return { code, uid };
+        },
+
+        watchRoom(code, callback) {
+            return onValue(
+                ref(realtimeDB, `multiplayerRooms/${code}`),
+                snapshot => callback(snapshot.val())
+            );
+        },
+
+        async startRoom(code) {
+            await authReady;
+
+            const uid = auth.currentUser.uid;
+            const roomRef = ref(realtimeDB, `multiplayerRooms/${code}`);
+
+            const result = await runTransaction(roomRef, room => {
+                if (!room || room.hostUid !== uid || room.status !== "waiting") return;
+                if (Object.keys(room.players || {}).length < 2) return;
+
+                room.status = "racing";
+                room.startedAt = Date.now() + 4000;
+
+                return room;
+            });
+
+            if (!result.committed) {
+                throw new Error("لا يمكن بدء السباق: يجب وجود لاعبين على الأقل، ويجب أن تكون أنت منشئ الغرفة.");
+            }
+        },
+
+        async publishPlayer(code, uid, state) {
+            await update(
+                ref(realtimeDB, `multiplayerRooms/${code}/players/${uid}`),
+                {
+                    x: Math.max(80, Math.min(320, Number(state.x) || 200)),
+                    progress: Math.max(0, Math.min(100, Number(state.progress) || 0)),
+                    score: Math.max(0, Math.floor(Number(state.score) || 0)),
+                    finished: !!state.finished,
+                    lastSeen: Date.now()
+                }
+            );
+        },
+
+        async finishPlayer(code, uid, score) {
+            const roomRef = ref(realtimeDB, `multiplayerRooms/${code}`);
+
+            await update(
+                ref(realtimeDB, `multiplayerRooms/${code}/players/${uid}`),
+                {
+                    finished: true,
+                    finalScore: Math.max(0, Math.floor(Number(score) || 0)),
+                    finishedAt: Date.now(),
+                    progress: 100
+                }
+            );
+
+            await runTransaction(roomRef, room => {
+                if (!room || room.status !== "racing") return room;
+
+                const players = Object.values(room.players || {});
+
+                if (players.length >= 2 && players.every(p => p.finished)) {
+                    room.status = "finished";
+                    room.finishedAt = Date.now();
+                }
+
+                return room;
+            });
+        },
+
+        async leaveRoom(code, uid) {
+            const roomRef = ref(realtimeDB, `multiplayerRooms/${code}`);
+
+            await remove(ref(realtimeDB, `multiplayerRooms/${code}/players/${uid}`));
+
+            const snapshot = await get(roomRef);
+            const room = snapshot.val();
+
+            if (!room || !room.players || Object.keys(room.players).length === 0) {
+                await remove(roomRef);
+            } else if (room.hostUid === uid) {
+                await update(roomRef, {
+                    hostUid: Object.keys(room.players)[0]
+                });
+            }
+        }
+    };
+</script>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
